@@ -1,0 +1,58 @@
+@font-face {
+    font-family: marco;
+    src: url("resources/Marco-Regular.woff2");
+}
+
+@font-face {
+    font-family: marco;
+    src: url("resources/Marco-Bold.woff2");
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: marco;
+    src: url("resources/Marco-Italic.woff2");
+    font-style: italic;
+}
+
+:root {
+    --background: #2a313b;
+    --foreground: #fdf6e3;
+}
+
+body {
+    font-family: marco, serif;
+    background-color: var(--background);
+    color: var(--foreground);
+    margin: 0;
+}
+h1 {
+    font-weight: bold;
+    font-size: 4rem;
+    margin: 0 0 1rem 0;
+}
+h2 {
+    font-style: italic;
+    margin: 0 0 0.5rem 0;
+}
+p {
+    margin: 0;
+}
+
+#border {
+    position: fixed;
+    background: none;
+    height: calc(100vh - 2rem);
+    width: calc(100vw - 2rem);
+    border: 1rem var(--background) solid;
+}
+#innerBorder {
+    position: fixed;
+    background: none;
+    height: calc(100vh - 2rem - 4px);
+    width: calc(100vw - 2rem - 4px);
+    border: 2px var(--foreground) solid;
+}
+#content {
+    padding: 2rem 2rem 0 2rem;
+}
