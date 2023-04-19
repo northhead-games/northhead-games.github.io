@@ -26,17 +26,59 @@ body {
     color: var(--foreground);
     margin: 0;
 }
+
 h1 {
     font-weight: bold;
     font-size: 4rem;
     margin: 0 0 1rem 0;
 }
+
 h2 {
     font-style: italic;
-    margin: 0 0 0.5rem 0;
+    font-size: 2rem;
+    margin: 0.5rem 0;
 }
+
+h3 {
+    font-style: bold;
+    font-size: 1.5rem;
+    margin: 0.5rem 0 0 0;
+}
+
+ul {
+    margin: 0;
+    padding-left: 1rem;
+}
+
 p {
     margin: 0;
+}
+
+a {
+    font-weight: bold;
+    color: var(--foreground);
+}
+
+a > sup {
+    font-weight: normal;
+}
+
+hr {
+    margin: 1rem 0;
+}
+
+section {
+    margin-bottom: 1rem;
+}
+
+img {
+    display: block;
+    margin: 1rem auto;
+    width: min(80vw, 400px);
+}
+
+span.code {
+    font-family: monospace;
 }
 
 #border {
@@ -45,6 +87,8 @@ p {
     height: calc(100vh - 2rem);
     width: calc(100vw - 2rem);
     border: 1rem var(--background) solid;
+    z-index: 1;
+    pointer-events: none;
 }
 #innerBorder {
     position: fixed;
@@ -52,7 +96,18 @@ p {
     height: calc(100vh - 2rem - 4px);
     width: calc(100vw - 2rem - 4px);
     border: 2px var(--foreground) solid;
+    z-index: 1;
+    pointer-events: none;
+}
+#back {
+    position: absolute;
+    font-size: 0.75rem;
+    top: 1.5rem;
+    left: 2rem;
 }
 #content {
-    padding: 2rem 2rem 0 2rem;
+    position: relative;
+    padding: 2rem;
+    width: min(100vw - 4rem - 4px, 800px);
+    margin: 0 auto;
 }
