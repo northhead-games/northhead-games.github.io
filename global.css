@@ -71,29 +71,37 @@ section {
     margin-bottom: 1rem;
 }
 
+
 img {
     display: block;
     margin: 1rem auto;
     width: min(80vw, 400px);
 }
 
+
 span.code {
     font-family: monospace;
 }
 
-#border {
+#borderWrapper {
     position: fixed;
-    background: none;
-    height: calc(100vh - 2rem);
-    width: calc(100vw - 2rem);
-    border: 1rem var(--background) solid;
+    height: 100vh;
+    height: 100dvh;
+    width: 100vw;
     z-index: 1;
     pointer-events: none;
 }
+
+#border {
+    background: none;
+    height: calc(100% - 2rem);
+    width: calc(100% - 2rem);
+    border: 1rem var(--background) solid;
+}
 #innerBorder {
-    position: fixed;
     background: none;
     height: calc(100vh - 2rem - 4px);
+    height: calc(-webkit-fill-available - 2rem - 4px);
     width: calc(100vw - 2rem - 4px);
     border: 2px var(--foreground) solid;
     z-index: 1;
