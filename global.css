@@ -100,9 +100,8 @@ span.code {
 }
 #innerBorder {
     background: none;
-    height: calc(100vh - 2rem - 4px);
-    height: calc(-webkit-fill-available - 2rem - 4px);
-    width: calc(100vw - 2rem - 4px);
+    height: calc(100% - 4px);
+    width: calc(100% - 4px);
     border: 2px var(--foreground) solid;
     z-index: 1;
     pointer-events: none;
