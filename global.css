@@ -19,6 +19,9 @@
     h1 {
 	font-size: 3rem !important;
     }
+    #borderWrapper {
+	visibility: hidden;
+    }
 }
 
 :root {
