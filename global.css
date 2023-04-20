@@ -15,6 +15,12 @@
     font-style: italic;
 }
 
+@media only screen and (min-width: 600px) {
+    body {
+	font-size: 150%;
+    }
+}
+
 :root {
     --background: #2a313b;
     --foreground: #fdf6e3;
