@@ -15,9 +15,9 @@
     font-style: italic;
 }
 
-@media only screen and (min-width: 600px) {
-    body {
-	font-size: 150%;
+@media only screen and (max-width: 600px) {
+    h1 {
+	font-size: 3rem !important;
     }
 }
 
