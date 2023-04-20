@@ -31,6 +31,7 @@
 :root {
     --background: #2a313b;
     --foreground: #fdf6e3;
+    --foreground2: #838b96;
 }
 
 body {
@@ -91,6 +92,11 @@ img {
     width: min(80vw, 400px);
 }
 
+.subhead {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: var(--foreground2);
+}
 
 span.code {
     font-family: monospace;
