@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Northhead Games - Unnamed Project</title>
     <link rel="stylesheet" href="global.css">
-    <script src="global.js"></script>
   </head>
   <body>
     <div id="borderWrapper">
@@ -50,8 +49,9 @@
 	  </p>
 	  <img src="images/kerning.jpg" alt="Kerning demo">
 	  <p>
-	    Freetype supports kerning, but unfortunately only via the TrueType <span class="code">kern</span> table.  The font I wanted to use does not have this table, instead it has the OpenType <span class="code">GPOS</span> table.  To read this table, the renderer now reads in the binary data, and extracts the kerning information for each pair of glyphs.  While the <span class="code">GPOS</span> table supports a huge amount of features, I've only implemented horizontal kerning, as I'm only rendering latin text.
+	    Freetype supports kerning, but unfortunately only via the TrueType <span class="code">kern</span> table.  The font I wanted to use does not have this table, instead it has the OpenType <span class="code">GPOS</span> table.  To read this table, the renderer now reads in the binary data, and extracts the kerning information for each pair of glyphs.  While the <span class="code">GPOS</span> table supports a huge amount of features, I've only implemented horizontal kerning, as I'm only rendering latin text.  The implementation borrows pretty heavily from the <span class="code">stb_truetype</span> library, which also implements kerning using the <span class="code">GPOS</span> table.  The result of all this work can be seen below, with nicely kerned glyphs:
 	  </p>
+	  <img src="images/text_rendering.png" alt="Kerning demo">
 	  <p>
 	    The last interesting bit of the engine to discuss<a href="#log0_note5"><sup>5</sup></a> is the way we're going to handle memory.  Most modern C/C++ game engines use a ton of <span class="code">new</span>s and <span class="code">delete</span>s to allocate memory for whatever they need.  Instead, taking after Handmade Hero, we're going to have the engine provide the game with a flat memory partition that it can do whatever it wants in, and not have any sort of memory allocation in the game code.  This has a few benefits.  The first is that we can guarantee that if a given has enough memory to allocate the flat partition, our game will run on it, eliminating a whole class of errors.  The second is that we won't be taking the performance hit of calling the operating system every frame to get new memory.  Finally, we can also hot swap the game code<a href="#log0_note6"><sup>6</sup></a> trivially.  While this is a pretty unorthodox approach to memory nowadays, I think it'll be interesting to see how it pays off.
 	  </p>
