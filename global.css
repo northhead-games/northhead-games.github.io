@@ -116,6 +116,7 @@ span.code {
 
 #back {
     font-size: 0.75rem;
+    margin-top: 1rem;
 }
 
 #content {
@@ -155,6 +156,9 @@ header > h1 {
     }
     #content {
 	width: auto;
+    }
+    #back {
+	margin-top: 0;
     }
     header > img {
 	width: 0;
