@@ -120,7 +120,7 @@ span.code {
 
 #content {
     position: relative;
-    padding: 2rem;
+    padding: 1rem;
     width: min(100vw - 4rem - 4px, 800px);
     margin: 0 auto;
 }
@@ -154,7 +154,6 @@ header > h1 {
 	visibility: hidden;
     }
     #content {
-	padding: 1.5rem;
 	width: auto;
     }
     header > img {
