@@ -60,7 +60,7 @@ a {
     color: var(--foreground);
 }
 
-a > sup {
+sup > a {
     font-weight: normal;
 }
 
@@ -141,6 +141,14 @@ header > img {
 header > h1 {
     flex-grow: 3;
     margin: 0 0 0 1rem;
+}
+
+div.notes > * {
+    margin-bottom: 0.5rem;
+}
+
+div.subnotes {
+    margin-left: 1em;
 }
 
 @media only screen and (max-width: 700px) {
