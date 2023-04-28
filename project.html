@@ -23,21 +23,48 @@
       <section>
 	<h2>Development Log</h2>
 	Below is a log of our progress so far.  Enjoy.
-	<article id="log0">
-	  <h3 id="log0">Log 0 — Getting Started</h3>
-	  <div class="subhead">20 April, 2023</div>
+	<article id="log1">
+	  <h3>Log 1 — Renderer Plumbing</h3>
+	  <div class="subhead">28 April, 2023</div>
 	  <p>
-	    Hi reader, welcome to the development log.  This "unnamed project"<a href="#log0_note1"><sup>1</sup></a> is going to be a sandbox factory building game, set in space.  Currently, the team consists of 3 programmers. All of us are finishing up our last year of university, with the hope being that we'll be able to put significant hours into the project in the coming months.  Our hope is to have something playable by August, but beyond that it doesn't seem appropriate to make predictions about timeline.
+	    Hi again, if you're reading this, that means that I've put out a second blog post and haven't immediately given up, so I'm going to call that a win.  My friend Chin wants me to create an RSS feed for this blog, so look out for that.  I'm also thinking about making an email list so I can send out alerts to people who really need to know exactly when the new Northhead Games<sup>TM</sup> Incorporated LLC © is up.  Anyways, this week I want to talk about the our renderer, as that was the primary focus of this week.
 	  </p>
 	  <p>
-	    There'll be a lot of technical details to talk about as this project progresses, so I'm just going to jump right in.  Initially, we were developing a small prototype of the game in Unity.  However, we were constantly running into problems with the garbage collector and just generally feeling hampered by an interface we don't have control over.  So, inspired partially by Casey Muratori's wonderful Handmade Hero series, we're going to create our own engine. Oh the <b>hubris</b>!  As anyone on the net will tell you, making your own engine is a horrible terrible idea that will always end in disaster.  Maybe they're right, but the truth it's just way more fun.  We're trying to minimize our use of external libraries, and maintain ownership over as much of the code as possible.  The code for the library itself will be public<a href="#log0_note2"><sup>2</sup></a>, so if you want to take a look at the code head over to the <a href="https://github.com/northhead-games/plover">GitHub</a> for it.  It's called <b>Plover</b> because we like shore birds and are tired of programming projects called things like "Neutronium."<a href="#log0_note3"><sup>3</sup></a>
+	    Because we're writing this system from more or less the groundup in C<sup><a href="#log1_note1">1</a></sup>, we also need to write a renderer ourselves.  I don't want to go down a rathole trying to write a general purpose renderer, so my goal for the renderer is to set up something that works for what we're trying to do right now, and then worry about what we might need later when we need it later.  For now, my goal was to have the ability to load arbitrary <span class="code">.obj</span> models with texture and normal maps, be able to transform them around world space, and have some basic Phong shading<sup><a href="#log1_note2">2</a></sup> with a directional light.  As I showed in the previous post, our renderer was already capable of loading a model and transforming it, but not much else.  Before adding new features however, I took some time to revise the renderer's interface to the game code.
+	  </p>
+	  <p>
+	    Previously, each action<sup><a href="#log1_note3">3</a></sup> the renderer could perform was called via a function in the game code.  While this was fine for testing that the game code could in fact call the renderer, and that the renderer was working, it presents a central problem:  the game code must wait on the renderer any time it calls down to it.  A secondary problem with this approach is that it does not lend itself to being parallelized later, as the renderer code would become tightly intertwined with the game logic.  Instead, we've switched to using a command queue system, to pass messages to and from the renderer.
+	  </p>
+	  <p>
+	    The command queue is super straightforward.  During the game code's execution, the code can make a call to the platform layer (Plover) to push a render command into the queue.  The queue itself is just a fixed size circular buffer, with an <span class="code">assert</span> to tell me if messages start getting overwritten.  The commands themselves are a tagged union, as that seemed like the most natural way to store the data, as opposed to some sort of template craziness.  The outgoing message queue that the renderer uses to send messages back to the game code is implemented in exactly the same way.  Currently, these queues are not thread safe, but adding a simple mutex lock<sup><a href="#log1_note4">4</a></sup> when rendering gets spun out onto a separate thread would be trivial.  Now onto the new renderer features that got added this week.
+	  </p>
+	  <div class="notes">
+	    <h4>Notes</h4>
+	    <p id="log1_note1">1. It's technically written in C++, but we use C++ features very sparingly.  We're not religious about it, but in general we use: function/operator overloading, method syntax<sup><a href="#log1_note1a">a</a></sup>, and references<sup><a href="#log1_note1b">b</a></sup>.  We stay away from heavy usage of templates and also don't really use virtual methods/OOP stuff.  As much fun as arcane debates about programming language features are, our main focus is writing code that executes instructions on the CPU/GPU :).</p>
+	    <div class="subnotes">
+	      <p id="log1_note1a">a. When functionality is really tightly coupled with data.</p>
+	      <p id="log1_note1b">b. Mostly because I find <span class="code">ptr->member</span> syntax pretty ugly and needing to changethe pointer is pretty rare.</p>
+	    </div>
+	    <p id="log1_note2">2. Phong shading is a shading method that uses an ambient, diffuse, and specular component to figure out the intensity of the lighting of each pixel.  It's a really old technique, but it's still very capable of creating nicely shaded models, particularly because we'll be going for a more stylized look and won't need the physical accuracy that more modern approaches provide.</p>
+	    <p id="log1_note3">3. Load a model, transform a model, create a material, etc.</p>
+	    <p id="log1_note4">4. Or potentially a more efficient concurrency mechanism like a fine-grained lock or non-blocking if it were warranted. As I'm writing this I should actually be studying for my concurrency exam tomorrow, so I could really overcomplicate things here if I wanted to.</p>
+	  </div>
+	</article>
+	<article id="log0">
+	  <h3>Log 0 — Getting Started</h3>
+	  <div class="subhead">20 April, 2023</div>
+	  <p>
+	    Hi reader, welcome to the development log.  This "unnamed project"<sup><a href="#log0_note1">1</a></sup> is going to be a sandbox factory building game, set in space.  Currently, the team consists of 3 programmers. All of us are finishing up our last year of university, with the hope being that we'll be able to put significant hours into the project in the coming months.  Our hope is to have something playable by August, but beyond that it doesn't seem appropriate to make predictions about timeline.
+	  </p>
+	  <p>
+	    There'll be a lot of technical details to talk about as this project progresses, so I'm just going to jump right in.  Initially, we were developing a small prototype of the game in Unity.  However, we were constantly running into problems with the garbage collector and just generally feeling hampered by an interface we don't have control over.  So, inspired partially by Casey Muratori's wonderful Handmade Hero series, we're going to create our own engine. Oh the <b>hubris</b>!  As anyone on the net will tell you, making your own engine is a horrible terrible idea that will always end in disaster.  Maybe they're right, but the truth it's just way more fun.  We're trying to minimize our use of external libraries, and maintain ownership over as much of the code as possible.  The code for the library itself will be public<sup><a href="#log0_note2">2</a></sup>, so if you want to take a look at the code head over to the <a href="https://github.com/northhead-games/plover">GitHub</a> for it.  It's called <b>Plover</b> because we like shore birds and are tired of programming projects called things like "Neutronium."<sup><a href="#log0_note3">3</a></sup>
 	  </p>
 	  <p>
 	    Because the game will be 3D, we needed to pick which graphics hardware API to use.  I personally had some familiarity with OpenGL, but wanted to use something with a more modern API.  Our options were between DX12, Metal, and Vulkan.  We ended up going with Vulkan, because we want to target Windows, Mac, and Linux, and don't want to have to port all of our graphics code between systems.  Initially we were a bit scared by Vulkan, as it has a reputation for being very complex, but frankly with some basic graphics programming experience it's not too hard to get to grips with, it's just significantly more verbose than OpenGL.  To get the renderer up and running, I went through the <a href="https://vulkan-tutorial.com">Vulkan tutorial</a>, which is really high quality.  We can now render this beautiful viking room test model thing:
 	  </p>
 	  <img src="images/viking_room.png" alt="Viking room render"/>
 	  <p>
-	    I have no doubt that you're exceedingly impressed by it. Initially, Yiğit and I tried implementing our own memory allocator<a href="#log0_note4"><sup>4</sup></a>.  Unfortunately, that ended up something like this:
+	    I have no doubt that you're exceedingly impressed by it. Initially, Yiğit and I tried implementing our own memory allocator<sup><a href="#log0_note4">4</a></sup>.  Unfortunately, that ended up something like this:
 	  </p>
 	  <img src="images/allocator_shit.png" alt="Allocator messing up"/>
 	  <p>
@@ -55,20 +82,22 @@
 	  </p>
 	  <img src="images/text_rendering.png" alt="Kerning demo">
 	  <p>
-	    The last interesting bit of the engine to discuss<a href="#log0_note5"><sup>5</sup></a> is the way we're going to handle memory.  Most modern C/C++ game engines use a ton of <span class="code">new</span>s and <span class="code">delete</span>s to allocate memory for whatever they need.  Instead, taking after Handmade Hero, we're going to have the engine provide the game with a flat memory partition that it can do whatever it wants in, and not have any sort of memory allocation in the game code.  This has a few benefits.  The first is that we can guarantee that if a given has enough memory to allocate the flat partition, our game will run on it, eliminating a whole class of errors.  The second is that we won't be taking the performance hit of calling the operating system every frame to get new memory.  Finally, we can also hot swap the game code<a href="#log0_note6"><sup>6</sup></a> trivially.  While this is a pretty unorthodox approach to memory nowadays, I think it'll be interesting to see how it pays off.
+	    The last interesting bit of the engine to discuss<sup><a href="#log0_note5">5</a></sup> is the way we're going to handle memory.  Most modern C/C++ game engines use a ton of <span class="code">new</span>s and <span class="code">delete</span>s to allocate memory for whatever they need.  Instead, taking after Handmade Hero, we're going to have the engine provide the game with a flat memory partition that it can do whatever it wants in, and not have any sort of memory allocation in the game code.  This has a few benefits.  The first is that we can guarantee that if a given has enough memory to allocate the flat partition, our game will run on it, eliminating a whole class of errors.  The second is that we won't be taking the performance hit of calling the operating system every frame to get new memory.  Finally, we can also hot swap the game code<sup><a href="#log0_note6">6</a></sup> trivially.  While this is a pretty unorthodox approach to memory nowadays, I think it'll be interesting to see how it pays off.
 	  </p>
 	  <p>
 	    This log is rather long, as it encompases a couple months of off and on work.  Sorry about that.  Our hope is that logs will be written weekly, but we'll see if that actually happens :).
 	  </p>
 	  <br>
 	  <p>— Oliver</p>
-	  <h4>Notes</h4>
-	  <p id="log0_note1">1. We call it ProjectG internally</p>
-	  <p id="log0_note2">2. I haven't decided on the license, but probably something something permissive like MIT.</p>
-	  <p id="log0_note3">3. Sorry if that's the name of your project.</p>
-	  <p id="log0_note4">4. For fun. Obviously.</p>
-	  <p id="log0_note5">5. So far, we hope.</p>
-	  <p id="log0_note6">6. Which is just a shared library with an exported function that runs each frame of the game loop. </p>
+	  <div class="notes">
+	    <h4>Notes</h4>
+	    <p id="log0_note1">1. We call it ProjectG internally</p>
+	    <p id="log0_note2">2. I haven't decided on the license, but probably something something permissive like MIT.</p>
+	    <p id="log0_note3">3. Sorry if that's the name of your project.</p>
+	    <p id="log0_note4">4. For fun. Obviously.</p>
+	    <p id="log0_note5">5. So far, we hope.</p>
+	    <p id="log0_note6">6. Which is just a shared library with an exported function that runs each frame of the game loop. </p>
+	  </div>
 	</article>
       </section>
     </div>
