@@ -38,16 +38,45 @@
 	  <p>
 	    The command queue is super straightforward.  During the game code's execution, the code can make a call to the platform layer (Plover) to push a render command into the queue.  The queue itself is just a fixed size circular buffer, with an <span class="code">assert</span> to tell me if messages start getting overwritten.  The commands themselves are a tagged union, as that seemed like the most natural way to store the data, as opposed to some sort of template craziness.  The outgoing message queue that the renderer uses to send messages back to the game code is implemented in exactly the same way.  Currently, these queues are not thread safe, but adding a simple mutex lock<sup><a href="#log1_note4">4</a></sup> when rendering gets spun out onto a separate thread would be trivial.  Now onto the new renderer features that got added this week.
 	  </p>
+	  <p>
+	    The next step after rejiggering the renderer API was implementing a basic lighting model.  We have plans for fancier stuff, but for testing and getting things up and running quickly I've done a really basic Phong type shader.  I'm not really going to go over the specifics, because this sort of lighting has been done to death, but if you're not familiar the tutorials at <a href="https://learnopengl.com/">learnopengl.com</a> are excellent.  However, I did encounter a few interesting issues worth talking about, and some worth showing because they have an appealing aesthetic, like this cool but totally screwed up shader test:
+	  </p>
+	  <img src="images/log1_glitch1.png" alt="Glitchy render"/>
+	  <p>
+	    While most of the implementation of the current lighting model went off without a hitch, I did spend an inordinate amount of time trying to figure out why the hell my normal maps were getting cloberred in the shader, like in this screenshot of my precious artefact with a stone texture on it:
+	  </p>
+	  <img src="images/log1_ArtefactLightingGlitch.png" alt="Messed up normals on artefact"/>
+	  <p>
+	    On first blush, it might look okay, but if you look a little more carefully you'll see really strange discontinuities in the lighting.  The problem ended up being that the normal map, which looks like this:
+	  </p>
+	  <img src="images/log1_StoneNormal.png" alt="Messed up normals on artefact"/>
+	  <p>
+	    was being interpreted in sRGB.  sRGB, or standard RGB, is a colorspace that maps the color values in our input textures to a value more appropriate to how our brains perceive color.  The curve of this mapping is as follows:
+	  </p>
+	  <img src="images/log1_LinearVsSrgb.webp" alt="Messed up normals on artefact"/>
+	  <p>
+	    While this mapping is great for our color (or albedo) textures<sup><a href="#log1_note5">5</a></sup>, it skews the normal vectors defined in the normal map, creating inaccurate normals in the final render of the object, as shown in this diagram:
+	  </p>
+	  <img src="images/log1_NormalSkewDiagram.jpg" alt="Messed up normals on artefact"/>
+	  <p>
+	    With that issue resolved, we can now render our models with normal and specular maps, which looks pretty good in my opinion:
+	  </p>
+	  <img src="images/log1_fullPhong.png" alt="Messed up normals on artefact"/>
+	  <p>
+	    Anyways, that's all for this week.  The plan is to have Yiğit write an article about the asset streaming system we're working on, so keep an eye out for that.  Also I made a <a href="https://twitter.com/northheadgames">Twitter</a>, so feel free to go follow that.
+	  </p>
+	  <p>— Oliver</p>
 	  <div class="notes">
 	    <h4>Notes</h4>
 	    <p id="log1_note1">1. It's technically written in C++, but we use C++ features very sparingly.  We're not religious about it, but in general we use: function/operator overloading, method syntax<sup><a href="#log1_note1a">a</a></sup>, and references<sup><a href="#log1_note1b">b</a></sup>.  We stay away from heavy usage of templates and also don't really use virtual methods/OOP stuff.  As much fun as arcane debates about programming language features are, our main focus is writing code that executes instructions on the CPU/GPU :).</p>
 	    <div class="subnotes">
 	      <p id="log1_note1a">a. When functionality is really tightly coupled with data.</p>
-	      <p id="log1_note1b">b. Mostly because I find <span class="code">ptr->member</span> syntax pretty ugly and needing to changethe pointer is pretty rare.</p>
+	      <p id="log1_note1b">b. Mostly because I find <span class="code">ptr->member</span> syntax pretty ugly and needing to change the pointer is pretty rare.</p>
 	    </div>
 	    <p id="log1_note2">2. Phong shading is a shading method that uses an ambient, diffuse, and specular component to figure out the intensity of the lighting of each pixel.  It's a really old technique, but it's still very capable of creating nicely shaded models, particularly because we'll be going for a more stylized look and won't need the physical accuracy that more modern approaches provide.</p>
 	    <p id="log1_note3">3. Load a model, transform a model, create a material, etc.</p>
 	    <p id="log1_note4">4. Or potentially a more efficient concurrency mechanism like a fine-grained lock or non-blocking if it were warranted. As I'm writing this I should actually be studying for my concurrency exam tomorrow, so I could really overcomplicate things here if I wanted to.</p>
+	    <p id="log1_note5">5. Colors tend to look washed out and lack depth with a linear mapping.</p>
 	  </div>
 	</article>
 	<article id="log0">
