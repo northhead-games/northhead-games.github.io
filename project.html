@@ -53,15 +53,17 @@
 	  <p>
 	    was being interpreted in sRGB.  sRGB, or standard RGB, is a colorspace that maps the color values in our input textures to a value more appropriate to how our brains perceive color.  The curve of this mapping is as follows:
 	  </p>
-	  <img src="images/log1_LinearVsSrgb.webp" alt="Messed up normals on artefact"/>
+	  <img src="images/log1_LinearVsSrgb.webp" alt="Linear vs SRGB curve"/>
 	  <p>
 	    While this mapping is great for our color (or albedo) textures<sup><a href="#log1_note5">5</a></sup>, it skews the normal vectors defined in the normal map, creating inaccurate normals in the final render of the object, as shown in this diagram:
 	  </p>
-	  <img src="images/log1_NormalSkewDiagram.jpg" alt="Messed up normals on artefact"/>
+	  <img src="images/log1_NormalSkewDiagram.jpg" alt="Diagram of normal skew"/>
 	  <p>
 	    With that issue resolved, we can now render our models with normal and specular maps, which looks pretty good in my opinion:
 	  </p>
-	  <img src="images/log1_fullPhong.png" alt="Messed up normals on artefact"/>
+	  <video loop autoplay>
+	    <source src="videos/Log1Video.webm" type="video/webm">
+	  </video>
 	  <p>
 	    Anyways, that's all for this week.  The plan is to have Yiğit write an article about the asset streaming system we're working on, so keep an eye out for that.  Also I made a <a href="https://twitter.com/northheadgames">Twitter</a>, so feel free to go follow that.
 	  </p>
