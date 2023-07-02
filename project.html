@@ -24,10 +24,10 @@
 	<h2>Development Log</h2>
 	Below is a log of our progress so far.  Enjoy.
 	<article id="log2">
-	  <h3>Log 2 — Blazingly Fast<sup>TM</sup> Glyph Rendering</h3>
+	  <h3>Log 2 - Blazingly Fast<sup>TM</sup> Glyph Rendering</h3>
 	  <div class="subhead">24 June, 2023</div>
 	  <p>
-	    And we're back.  Most of us graduated from university in the past month or so, and I moved, so progress slowed down for a bit, although that's not to say there hasn't been any, it's just that more blog posts weren't our priority given their audience is, generously, about 5 people.  Alex has been working on a physics system, and Yiğit's been working on an asset management/serialization system for all of the data we're gonna need<sup><a href="#log2_note1">1</a></sup>.  This week though, I'm going to be talking about my pet project for the past few weeks:  Working on a UI and text rendering solution.
+	    And we're back.  Most of us graduated from university in the past month or so, and I moved, so progress slowed down for a bit, although that's not to say there hasn't been any, it's just that more blog posts weren't our priority given their audience is, generously, about 5 people.  Alex has been working on a physics system, and Yigit's been working on an asset management/serialization system for all of the data we're gonna need<sup><a href="#log2_note1">1</a></sup>.  This week though, I'm going to be talking about my pet project for the past few weeks: Working on a UI and text rendering solution.
 	  </p>
 	  <p>
 	    As mentioned in <a href="#log1">Log 1</a>, text rasterization is something that I sorted out pretty early on.  However, all that the existing code could do was rasterize predefined text to a texture, and then render that texture to a quad.  This would be fine for static text or buttons, but obviously not for any dynamic content, such as rendering debug info, which happens to be something we really need as we begin to develop tools for working on the game.  Generally my approach when faced with something I don't know much about<sup><a href="#log2_note2">2</a></sup> is to begin by trying to get it working in the simplest way I can think of.  In this case, that was using my existing text rendering code, which renders set text to a bitmap, to create a new bitmap<sup><a href="#log2_note3">3</a></sup> and upload it as a texture to the GPU each frame.  This worked fine, except that it was abysmally slow.
@@ -45,7 +45,7 @@
 	    I also was initially drawing the quads the same way I draw all of the 3D geometry: using a vertex buffer and an index buffer.  While this makes sense for rendering 3D meshes, we end up with a lot of redundant data when rendering quads.  For example, for a given quad, we have 4 vertices, which each contain their position, texture coordinate, and character.  This data can be calculated for each vertex in the quad by just knowing the position and character of the quad.  In addition to this redundancy, the vertex and index buffers need to be updated each frame.  Eating up the bus's bandwidth on redundant data is no good, and so I revised my approach.
 	  </p>
 	  <p>
-	    Instead of using a vertex and index buffer to hold the quad geometry, I got rid of them completely, and instead just tell the GPU to draw 6 vertices<sup><a href="log2_note6">6</a></sup> for each quad, but don't provide any data per vertex.  Then, in the vertex shader, I use the builtin <span class="code">gl_VertexIndex</span> to calculate which quad is being drawn, and which vertex within that quad is being drawn.  However, the data for each quad still has to exist somewhere on the GPU to be accessible to the vertex shader.  To accomplish this, I use a "shader storage buffer object," or SSBO.  An SSBO is really just a buffer the GPU can read and write from a shader, and can contain really anything we need it to.  It has the advantage of being able to be much larger than uniform buffers and being writeable from the GPU, at the cost of some speed<sup><a href="log2_note7">7</a></sup>.  The SSBO contains the data for each quad that needs to be drawn, and is persistently host mapped, meaning that it can always be written to from the CPU.
+	    Instead of using a vertex and index buffer to hold the quad geometry, I got rid of them completely, and instead just tell the GPU to draw 6 vertices<sup><a href="#log2_note6">6</a></sup> for each quad, but don't provide any data per vertex.  Then, in the vertex shader, I use the builtin <span class="code">gl_VertexIndex</span> to calculate which quad is being drawn, and which vertex within that quad is being drawn.  However, the data for each quad still has to exist somewhere on the GPU to be accessible to the vertex shader.  To accomplish this, I use a "shader storage buffer object," or SSBO.  An SSBO is really just a buffer the GPU can read and write from a shader, and can contain really anything we need it to.  It has the advantage of being able to be much larger than uniform buffers and being writeable from the GPU, at the cost of some speed<sup><a href="#log2_note7">7</a></sup>.  The SSBO contains the data for each quad that needs to be drawn, and is persistently host mapped, meaning that it can always be written to from the CPU.
 	  </p>
 	  <p>
 	    That's more or less it for the text rendering.  It's a shockingly deep topic when you start really drilling down into it, but I've found this quads-and-texture-arrays approach good enough for what we need it for, at least for the time being.  You can see a small UI rendered using this new method below:
@@ -54,7 +54,9 @@
 	  <p>
 	    I've still gotta make an RSS feed for these...
 	  </p>
-	  <p>— Oliver</p>
+	  <p>
+	    - Oliver
+	  </p>
 	  <div class="notes">
 	    <h4>Notes</h4>
 	    <p id="log2_note1">1. They should have posts about these in the coming weeks if I bother them enough.</p>
@@ -63,14 +65,14 @@
 	    <p id="log2_note4">4. Or a 1/6 if your name starts with "B" and ends in "ethesda".</p>
 	    <p id="log2_note5">5. Mipmaps are downscaled copies of a texture that the GPU keeps on hand (if enabled) to use if the texture is farther away.</p>
 	    <p id="log2_note6">6. Six because, now that we've gotten rid of the indices, we need separate vertices for each triangle, and each quad is made up of two triangles.</p>
-	    <p id="log2_notey">7. Allegedly</p>
+	    <p id="log2_note7">7. Allegedly.</p>
 	  </div>
 	</article>
 	<article id="log1">
-	  <h3>Log 1 — Renderer Plumbing</h3>
+	  <h3>Log 1 - Renderer Plumbing</h3>
 	  <div class="subhead">28 April, 2023</div>
 	  <p>
-	    Hi again, if you're reading this, that means that I've put out a second blog post and haven't immediately given up, so I'm going to call that a win.  My friend Chin wants me to create an RSS feed for this blog, so look out for that.  I'm also thinking about making an email list so I can send out alerts to people who really need to know exactly when the new Northhead Games<sup>TM</sup> Incorporated LLC © is up.  Anyways, this week I want to talk about the our renderer, as that was the primary focus of this week.
+	    Hi again, if you're reading this, that means that I've put out a second blog post and haven't immediately given up, so I'm going to call that a win.  My friend Chin wants me to create an RSS feed for this blog, so look out for that.  I'm also thinking about making an email list so I can send out alerts to people who really need to know exactly when the new Northhead Games<sup>TM</sup> Incorporated LLC Â© is up.  Anyways, this week I want to talk about the our renderer, as that was the primary focus of this week.
 	  </p>
 	  <p>
 	    Because we're writing this system from more or less the groundup in C<sup><a href="#log1_note1">1</a></sup>, we also need to write a renderer ourselves.  I don't want to go down a rathole trying to write a general purpose renderer, so my goal for the renderer is to set up something that works for what we're trying to do right now, and then worry about what we might need later when we need it later.  For now, my goal was to have the ability to load arbitrary <span class="code">.obj</span> models with texture and normal maps, be able to transform them around world space, and have some basic Phong shading<sup><a href="#log1_note2">2</a></sup> with a directional light.  As I showed in the previous post, our renderer was already capable of loading a model and transforming it, but not much else.  Before adding new features however, I took some time to revise the renderer's interface to the game code.
@@ -108,24 +110,27 @@
 	    <source src="videos/Log1Video.webm" type="video/webm">
 	  </video>
 	  <p>
-	    Anyways, that's all for this week.  The plan is to have Yiğit write an article about the asset streaming system we're working on, so keep an eye out for that.  Also I made a <a href="https://twitter.com/northheadgames">Twitter</a>, so feel free to go follow that.
+	    Anyways, that's all for this week.  The plan is to have Yigit write an article about the asset streaming system we're working on, so keep an eye out for that.  Also I made a <a href="https://twitter.com/northheadgames">Twitter</a>, so feel free to go follow that.
 	  </p>
-	  <p>— Oliver</p>
+	  <p>
+	    - Oliver
+	  </p>
 	  <div class="notes">
 	    <h4>Notes</h4>
-	    <p id="log1_note1">1. It's technically written in C++, but we use C++ features very sparingly.  We're not religious about it, but in general we use: function/operator overloading, method syntax<sup><a href="#log1_note1a">a</a></sup>, and references<sup><a href="#log1_note1b">b</a></sup>.  We stay away from heavy usage of templates and also don't really use virtual methods/OOP stuff.  As much fun as arcane debates about programming language features are, our main focus is writing code that executes instructions on the CPU/GPU :).</p>
+	    <p id="log1_note1">1. It's technically written in C++, but we use C++ features very sparingly. We're not religious about it, but in general we use: function/operator overloading, method syntax<sup><a href="#log1_note1a">a</a></sup>, and references<sup><a href="#log1_note1b">b</a></sup>. We stay away from heavy usage of templates and also don't really use virtual methods/OOP stuff. As much fun as arcane debates about programming language features are, our main focus is writing code that executes instructions on the CPU/GPU :).</p>
 	    <div class="subnotes">
-	      <p id="log1_note1a">a. When functionality is really tightly coupled with data.</p>
+	      <p id="log1_note1a">a. When functionality is really tightly coupled with data</p>
 	      <p id="log1_note1b">b. Mostly because I find <span class="code">ptr->member</span> syntax pretty ugly and needing to change the pointer is pretty rare.</p>
 	    </div>
-	    <p id="log1_note2">2. Phong shading is a shading method that uses an ambient, diffuse, and specular component to figure out the intensity of the lighting of each pixel.  It's a really old technique, but it's still very capable of creating nicely shaded models, particularly because we'll be going for a more stylized look and won't need the physical accuracy that more modern approaches provide.</p>
+	    <p id="log1_note2">2. Phong shading is a shading method that uses an ambient, diffuse, and specular component to figure out the intensity of the lighting of each pixel. It's a really old technique, but it's still very capable of creating nicely shaded models, particularly because we'll be going for a more stylized look and won't need the physical accuracy that more modern approaches provide.</p>
 	    <p id="log1_note3">3. Load a model, transform a model, create a material, etc.</p>
 	    <p id="log1_note4">4. Or potentially a more efficient concurrency mechanism like a fine-grained lock or non-blocking if it were warranted. As I'm writing this I should actually be studying for my concurrency exam tomorrow, so I could really overcomplicate things here if I wanted to.</p>
 	    <p id="log1_note5">5. Colors tend to look washed out and lack depth with a linear mapping.</p>
 	  </div>
 	</article>
+
 	<article id="log0">
-	  <h3>Log 0 — Getting Started</h3>
+	  <h3>Log 0 - Getting Started</h3>
 	  <div class="subhead">20 April, 2023</div>
 	  <p>
 	    Hi reader, welcome to the development log.  This "unnamed project"<sup><a href="#log0_note1">1</a></sup> is going to be a sandbox factory building game, set in space.  Currently, the team consists of 3 programmers. All of us are finishing up our last year of university, with the hope being that we'll be able to put significant hours into the project in the coming months.  Our hope is to have something playable by August, but beyond that it doesn't seem appropriate to make predictions about timeline.
@@ -138,7 +143,7 @@
 	  </p>
 	  <img src="images/viking_room.png" alt="Viking room render"/>
 	  <p>
-	    I have no doubt that you're exceedingly impressed by it. Initially, Yiğit and I tried implementing our own memory allocator<sup><a href="#log0_note4">4</a></sup>.  Unfortunately, that ended up something like this:
+	    I have no doubt that you're exceedingly impressed by it. Initially, Yigit and I tried implementing our own memory allocator<sup><a href="#log0_note4">4</a></sup>.  Unfortunately, that ended up something like this:
 	  </p>
 	  <img src="images/allocator_shit.png" alt="Allocator messing up"/>
 	  <p>
@@ -150,27 +155,28 @@
 	  <p>
 	    The main snag with text rendering was getting kerning working.  Kerning is how typographers define how individual pairs of glyphs should be spaced, as shown in this image I stole:
 	  </p>
-	  <img src="images/kerning.jpg" alt="Kerning demo">
+	  <img src="images/kerning.jpg" alt="Kerning demo"/>
 	  <p>
 	    Freetype supports kerning, but unfortunately only via the TrueType <span class="code">kern</span> table.  The font I wanted to use does not have this table, instead it has the OpenType <span class="code">GPOS</span> table.  To read this table, the renderer now reads in the binary data, and extracts the kerning information for each pair of glyphs.  While the <span class="code">GPOS</span> table supports a huge amount of features, I've only implemented horizontal kerning, as I'm only rendering latin text.  The implementation borrows pretty heavily from the <span class="code">stb_truetype</span> library, which also implements kerning using the <span class="code">GPOS</span> table.  The result of all this work can be seen below, with nicely kerned glyphs:
 	  </p>
-	  <img src="images/text_rendering.png" alt="Kerning demo">
+	  <img src="images/text_rendering.png" alt="Kerning demo"/>
 	  <p>
 	    The last interesting bit of the engine to discuss<sup><a href="#log0_note5">5</a></sup> is the way we're going to handle memory.  Most modern C/C++ game engines use a ton of <span class="code">new</span>s and <span class="code">delete</span>s to allocate memory for whatever they need.  Instead, taking after Handmade Hero, we're going to have the engine provide the game with a flat memory partition that it can do whatever it wants in, and not have any sort of memory allocation in the game code.  This has a few benefits.  The first is that we can guarantee that if a given has enough memory to allocate the flat partition, our game will run on it, eliminating a whole class of errors.  The second is that we won't be taking the performance hit of calling the operating system every frame to get new memory.  Finally, we can also hot swap the game code<sup><a href="#log0_note6">6</a></sup> trivially.  While this is a pretty unorthodox approach to memory nowadays, I think it'll be interesting to see how it pays off.
 	  </p>
 	  <p>
 	    This log is rather long, as it encompases a couple months of off and on work.  Sorry about that.  Our hope is that logs will be written weekly, but we'll see if that actually happens :).
 	  </p>
-	  <br>
-	  <p>— Oliver</p>
+	  <p>
+	    - Oliver
+	  </p>
 	  <div class="notes">
 	    <h4>Notes</h4>
-	    <p id="log0_note1">1. We call it ProjectG internally</p>
+	    <p id="log0_note1">1. We call it ProjectG internally.</p>
 	    <p id="log0_note2">2. I haven't decided on the license, but probably something something permissive like MIT.</p>
 	    <p id="log0_note3">3. Sorry if that's the name of your project.</p>
 	    <p id="log0_note4">4. For fun. Obviously.</p>
 	    <p id="log0_note5">5. So far, we hope.</p>
-	    <p id="log0_note6">6. Which is just a shared library with an exported function that runs each frame of the game loop. </p>
+	    <p id="log0_note6">6. Which is just a shared library with an exported function that runs each frame of the game loop.</p>
 	  </div>
 	</article>
       </section>
