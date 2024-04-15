@@ -1,17 +1,11 @@
 @font-face {
-    font-family: marco;
-    src: url("resources/Marco-Regular.woff2");
+    font-family: sedan;
+    src: url("resources/Sedan-Regular.ttf");
 }
 
 @font-face {
-    font-family: marco;
-    src: url("resources/Marco-Bold.woff2");
-    font-weight: bold;
-}
-
-@font-face {
-    font-family: marco;
-    src: url("resources/Marco-Italic.woff2");
+    font-family: sedan;
+    src: url("resources/Sedan-Italic.ttf");
     font-style: italic;
 }
 
@@ -22,7 +16,7 @@
 }
 
 body {
-    font-family: marco, serif;
+    font-family: sedan, serif;
     background-color: var(--background);
     color: var(--foreground);
     margin: 0;
@@ -79,6 +73,10 @@ img,video {
     width: min(80vw, 400px);
 }
 
+img.logo {
+    margin: 0 auto;
+}
+
 .subhead {
     font-weight: bold;
     margin-bottom: 0.5rem;
@@ -129,7 +127,7 @@ span.code {
 header {
     display: flex;
     height: 5rem;
-    margin-bottom: 1rem;
+    margin: 1rem 0;
 }
 
 header > img {
